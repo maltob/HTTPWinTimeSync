@@ -55,48 +55,8 @@ namespace HTTPWinTimeSync
             {
                 while (true)
                 {
-                    
 
-                    List<double> offsets = new List<double>();
-                    foreach (var sync in timeSynchronizers)
-                    {
-
-                        try
-                        {
-
-                            //Sync any URL's not excluded
-                            if (!skipURL.Contains(sync.SyncURL))
-                            {
-                                var offsetRes = sync.Offset();
-                                offsetRes.Wait();
-                                offsets.Add(offsetRes.Result);
-
-                            }
-
-
-
-                        }
-                        catch (HTTPClientSyncException httpSyncEx)
-                        {
-
-                            // We didn't get a successful status, add to list to skip
-                            skipURL.Add(sync.SyncURL);
-                            Logger.Debug(httpSyncEx.Message);
-                        }
-                        catch(Exception e)
-                        {
-                            //Something else went wrong
-                        }
-                    }
-
-                    //Adjust the times
-                    var adjustedMilli = AdjustTime(offsets.ToArray());
-                    if(Math.Abs(adjustedMilli) > 15*1000)
-                        Logger.Info("Adjusted time by {0} seconds", adjustedMilli/1000);
-                    else
-                        Logger.Info("Did not adjust the time - it was only off by {0} milliseconds", adjustedMilli);
-
-
+                    SyncOnce();
 
                     //Wait for sleepTime minutes to resync
                     Logger.Debug("Pausing for {0} minutes before next sync", sleepTime);
@@ -104,7 +64,7 @@ namespace HTTPWinTimeSync
 
 
                     // Clear the skip list if its been over 4 hours - Untested what happens at 49.8 days
-                    if(skipURL.Count > 0 && Math.Abs((((long)(Environment.TickCount & Int32.MaxValue))) - lastSkipURLClear) > (1000 * 60 * 60 * 4)) 
+                    if (skipURL.Count > 0 && Math.Abs((((long)(Environment.TickCount & Int32.MaxValue))) - lastSkipURLClear) > (1000 * 60 * 60 * 4))
                     {
                         lastSkipURLClear = Environment.TickCount & Int32.MaxValue;
                         skipURL.Clear();
@@ -129,6 +89,54 @@ namespace HTTPWinTimeSync
             }
         }
 
+
+        public void SyncOnce()
+        {
+            List<double> offsets = new List<double>();
+            foreach (var sync in timeSynchronizers)
+            {
+
+                try
+                {
+
+                    //Sync any URL's not excluded
+                    if (!skipURL.Contains(sync.SyncURL))
+                    {
+                        var offsetRes = sync.Offset();
+                        offsetRes.Wait();
+                        offsets.Add(offsetRes.Result);
+
+                    }
+
+
+
+                }
+                catch (HTTPClientSyncException httpSyncEx)
+                {
+
+                    // We didn't get a successful status, add to list to skip
+                    skipURL.Add(sync.SyncURL);
+                    Logger.Debug(httpSyncEx.Message);
+                }
+                catch (Exception e)
+                {
+                    //Something else went wrong
+                }
+            }
+
+            //Adjust the times
+            var adjustedMilli = AdjustTime(offsets.ToArray());
+            if (Math.Abs(adjustedMilli) > 15 * 1000)
+                Logger.Info("Adjusted time by {0} seconds", adjustedMilli / 1000);
+            else
+                Logger.Info("Did not adjust the time - it was only off by {0} milliseconds", adjustedMilli);
+
+
+
+            
+
+        }
+    
 
 
 
