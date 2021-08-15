@@ -14,7 +14,7 @@ namespace HTTPWinTimeSync
         List<HTTPTimeSynchronizer> timeSynchronizers = new List<HTTPTimeSynchronizer>();
         List<Uri> skipURL = new List<Uri>();
         int lastSkipURLClear = 0;
-        int sleepTime = 30;
+        int sleepTime = 120;
 
         private static NLog.Logger Logger ;
 
