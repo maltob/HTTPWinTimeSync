@@ -91,7 +91,7 @@ namespace HTTPWinTimeSync
 
                     //Adjust the times
                     var adjustedMilli = AdjustTime(offsets.ToArray());
-                    if(Math.Abs(adjustedMilli) < 15*1000)
+                    if(Math.Abs(adjustedMilli) > 15*1000)
                         Logger.Info("Adjusted time by {0} seconds", adjustedMilli/1000);
                     else
                         Logger.Info("Did not adjust the time - it was only off by {0} milliseconds", adjustedMilli);

@@ -34,12 +34,7 @@ namespace HTTPWinTimeSync
             acl.AddAccessRule(new FileSystemAccessRule("NT AUTHORITY\\LOCALSERVICE", FileSystemRights.Read | FileSystemRights.Write | FileSystemRights.Modify, AccessControlType.Allow));
             logFileInfo.SetAccessControl(acl);
 
-            //If there is a URLs.txt here, copy it over
-            if(File.Exists("URLs.txt"))
-            {
-                string urlFileDest = Path.Combine(Path.GetDirectoryName(Context.Parameters["assemblypath"]), "URLs.txt");
-                File.Copy("URLs.txt", urlFileDest, true);
-            }
+          
 
         }
     }
